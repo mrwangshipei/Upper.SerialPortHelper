@@ -24,7 +24,19 @@
 
 * **支持发送后等待响应（SendAndWaitResult）**：封装典型收发流程。
 
+---
 
+# Upper.SerialPortHelper
+
+本项目采用 [Mozilla Public License 2.0 (MPL-2.0)](https://www.mozilla.org/en-US/MPL/2.0/) 开源。
+
+## 主要授权条款说明
+
+- 允许商业用途，包括闭源项目。
+- 只要你修改了本项目的源码文件（如`.cs`文件），必须将修改后的这些文件开源。
+- 你可以将本项目与闭源代码一同分发，未修改本项目文件的代码不受MPL约束。
+
+如需了解详细条款，请参阅 [LICENSE](./LICENSE) 文件或官方协议说明。
 
 ---
 
