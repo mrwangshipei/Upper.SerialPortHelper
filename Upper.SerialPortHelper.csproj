@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Upper.SerialPortHelper</RootNamespace>
+    <AssemblyName>Upper.SerialPortHelper</AssemblyName>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo> <!-- 可选，自动生成程序集信息 -->
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="9.0.7" />
+  </ItemGroup>
+
+</Project>

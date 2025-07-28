@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Upper.SerialPortHelper", "Upper.SerialPortHelper.csproj", "{F0F7C5D9-F7F0-458E-A266-15C1FDEC4483}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0F7C5D9-F7F0-458E-A266-15C1FDEC4483}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0F7C5D9-F7F0-458E-A266-15C1FDEC4483}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0F7C5D9-F7F0-458E-A266-15C1FDEC4483}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0F7C5D9-F7F0-458E-A266-15C1FDEC4483}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CDCCD24A-0254-4528-A4DD-D71753E862C7}
+	EndGlobalSection
+EndGlobal
