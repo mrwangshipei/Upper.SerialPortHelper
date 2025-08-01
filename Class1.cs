@@ -26,7 +26,6 @@ namespace Upper.SerialPortHelper
         /// </summary>
         public event Action<string> Log;
         #region 变量
-        private System.Timers.Timer ti;
         private CancellationTokenSource delayTokenSource;
         private readonly object readlock = new object();
         private readonly object writelock = new object(); 
@@ -34,6 +33,9 @@ namespace Upper.SerialPortHelper
         private readonly object datalock = new object(); 
         private Task currentDelayTask = Task.CompletedTask;
         protected ConcurrentQueue<ManualResetEvent> manualResetEvents = new ConcurrentQueue<ManualResetEvent>();
+
+        public long ReadBuffer { get; private set; }
+
         protected SerialPort serial;
         protected List<byte> ReceiveData = new List<byte>();
         #endregion
@@ -55,7 +57,7 @@ namespace Upper.SerialPortHelper
         /// <param name="MsgsWaitTime">完整的一帧数据最少要多久</param>
         /// <exception cref="ArgumentNullException">参数serial不能为空</exception>
         /// <exception cref="ArgumentException">MsgsWaitTime不能小于0</exception>
-        public SerialPortHelper(SerialPort serial,int MsgsWaitTime = 35) 
+        public SerialPortHelper(SerialPort serial,int MsgsWaitTime = 35,long ReadBuffer = 90000) 
         {
             if (serial == null)
             {
@@ -65,23 +67,20 @@ namespace Upper.SerialPortHelper
             {
                 throw new ArgumentException("MsgsWaitTime不能小于0");
             }
+            if (ReadBuffer < 1)
+            {
+                throw new ArgumentException("ReadBuffer 不能小于1");
+
+            }
+            this.ReadBuffer = ReadBuffer;
             this.serial = serial;
             this.MsgWaitTime = MsgsWaitTime;
-            ti = new System.Timers.Timer(this.MsgWaitTime);
-            ti.Elapsed += Ti_Elapsed;
+           
             serial.DataReceived += Serial_DataReceived;
         }
         #endregion
         #region 私有函数
-        private void Ti_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            ManualResetEvent mrs;
-            while (manualResetEvents.TryDequeue(out mrs))
-            {
-                mrs.Set();
-                mrs.Dispose();
-            }
-        }
+      
         /// <summary>
         /// 传入的串口数据到达事件处理逻辑中，
         /// 会自动读取数据并累加到 ReceiveData 中。
@@ -97,7 +96,14 @@ namespace Upper.SerialPortHelper
                     var temp = new byte[num];
                     serial.Read(temp, 0, num);
                     lock (datalock)
+                    { 
                         ReceiveData.AddRange(temp);
+                        while (ReceiveData.Count > ReadBuffer)
+                        {
+                            ReceiveData.RemoveRange(0,(int)( ReadBuffer - ReceiveData.Count));
+                        }
+                    }
+                    Log?.Invoke($"收到数据, {BitConverter.ToString(ReceiveData.ToArray())}");
                     CallAllWait();
                 }
             }
@@ -160,7 +166,6 @@ namespace Upper.SerialPortHelper
 
         public void Dispose()
         {
-            ti?.Dispose();
             serial?.Dispose();
             delayTokenSource?.Cancel(); // 取消延迟任务
             delayTokenSource?.Dispose();
@@ -193,8 +198,11 @@ namespace Upper.SerialPortHelper
         public void Send(byte[] msg)
         {
             if (isOpen)
-            lock (writelock)
-                serial.Write(msg,0,msg.Length);
+                lock (writelock)
+                { 
+                    serial.Write(msg, 0, msg.Length);
+                    Log?.Invoke($"发出数据, {BitConverter.ToString(msg)}");
+                }
         }
         /// <summary>
         /// 看数据并且清理
@@ -225,7 +233,17 @@ namespace Upper.SerialPortHelper
             if (ReceiveData.Count > 0)
                 lock (datalock)
                     if (ReceiveData.Count > 0)
-                        return ReceiveData.ToArray();
+                        try
+                        {
+                            return ReceiveData.ToArray();
+                        }
+                        finally
+                        {
+                            if (!onlyread)
+                            {
+                                ReceiveData.Clear();
+                            }
+                        }
             var mst = new ManualResetEvent(false);
             manualResetEvents.Enqueue(mst);
             mst.WaitOne(waitms);
